@@ -1,0 +1,14 @@
+{
+    "serverPort": 5000,
+
+    "MYSQL_HOST": "localhost",
+    "MYSQL_USER": "root",
+    "MYSQL_DB_NAME": "tech_shop",
+    "MYSQL_PASS": "",
+    "MYSQL_ConnectionLimit": 151,
+    "MYSQL_waitForConnections": true,
+    "MYSQL_queueLimit": 0,
+    "MYSQL_Timeout": 6000,
+
+    "secret_key":"amin_rakchik_staryi"
+}
