@@ -121,5 +121,32 @@ router.post('/get_products', async (req, res) => {
     }
 })
 
+router.post('/get_product', async (req, res) => {
+    try {
+
+        mysqls.executeQuery(`SELECT * FROM products WHERE products_id = '${req.body.product_id}' LIMIT 1`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+
+            return res.json({
+                product: {
+                    name: rows[0].name,
+                    price: rows[0].price
+                }
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 
 module.exports = router;
