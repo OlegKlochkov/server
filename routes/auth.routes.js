@@ -199,4 +199,52 @@ router.post('/add_review', async (req, res) => {
     }
 })
 
+router.post('/get_categories', async (req, res) => {
+    try {
+
+        mysqls.executeQuery(`SELECT * FROM categories`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            return res.json({
+                categories: rows
+            })
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
+router.post('/get_product_categories', async (req, res) => {
+    try {
+
+        mysqls.executeQuery(`SELECT category_name FROM products_categories WHERE product_id = '${req.body.product_id}'`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            return res.json({
+                product_categories: rows
+            })
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
