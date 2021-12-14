@@ -226,7 +226,7 @@ router.post('/get_categories', async (req, res) => {
 router.post('/get_product_categories', async (req, res) => {
     try {
 
-        mysqls.executeQuery(`SELECT category_name FROM products_categories WHERE product_id = '${req.body.product_id}'`, function (err, rows, fields) {
+        mysqls.executeQuery(`SELECT category_name FROM products_categories WHERE products_id = '${req.body.product_id}'`, function (err, rows, fields) {
 
             if (err) {
                 console.log('[DATABASE | ERROR] ' + err);
