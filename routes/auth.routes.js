@@ -148,5 +148,55 @@ router.post('/get_product', async (req, res) => {
     }
 })
 
+router.post('/get_reviews', async (req, res) => {
+    try {
+
+        mysqls.executeQuery(`SELECT reviews.*, clients.client_id, clients.name, clients.second_name
+         FROM reviews, clients WHERE reviews.product_id = '${req.body.product_id}' AND reviews.client_id = clients.client_id`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            let arr = [];
+            rows.forEach(element => {
+                arr.push({
+                    rating: element.rating,
+                    message: element.message,
+                    name: element.name,
+                    second_name: element.second_name
+                })
+            });
+            return res.json({
+                reviews: arr
+            })
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
+router.post('/add_review', async (req, res) => {
+    try {
+        const {client_id, product_id, message, rating} = req.body
+        let ratingInt = parseInt(rating, 10);
+
+        if(rating.length == 1 && ratingInt >= 1 && ratingInt <=5){
+            mysqls.executeQuery(`INSERT INTO reviews (client_id, product_id, message, rating) VALUES ('${client_id}', '${product_id}', '${message}', '${rating}')`);
+            res.send("Отзыв успешно добавлен")
+        }else{
+            res.send("Введите целое число от 1 до 5!!!")
+        }
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
 
 module.exports = router;
