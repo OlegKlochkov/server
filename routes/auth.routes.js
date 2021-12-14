@@ -247,4 +247,38 @@ router.post('/get_product_categories', async (req, res) => {
     }
 })
 
+router.post('/get_category_products', async (req, res) => {
+    try {
+
+        mysqls.executeQuery(`SELECT products_categories.*, products.products_id, products.name, products.price
+        FROM products_categories, products WHERE products_categories.category_name = '${req.body.category_name}' 
+        AND products_categories.products_id = products.products_id`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            let arr = [];
+            rows.forEach(element => {
+                arr.push({
+                    products_id: element.products_id,
+                    name: element.name,
+                    price: element.price
+                })
+            });
+            return res.json({
+                category_products: arr
+            })
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
