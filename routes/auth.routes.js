@@ -281,4 +281,34 @@ router.post('/get_category_products', async (req, res) => {
     }
 })
 
+router.post('/get_client', async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.body.token, config.get('secret_key'));
+        mysqls.executeQuery(`SELECT * FROM clients WHERE client_id = ${decoded.id} LIMIT 1`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            return res.json({
+                client: {
+                    name: rows[0].name,
+                    second_name: rows[0].second_name,
+                    third_name: rows[0].third_name,
+                    email: rows[0].email,
+                    client_address: rows[0].client_address,
+                    phone_number: rows[0].phone_number
+                }
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
