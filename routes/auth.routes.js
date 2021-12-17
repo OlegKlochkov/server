@@ -311,4 +311,28 @@ router.post('/get_client', async (req, res) => {
     }
 })
 
+router.post('/update_client', async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.body.token, config.get('secret_key'));
+        mysqls.executeQuery(`UPDATE clients 
+        SET name = '${req.body.name}', second_name = '${req.body.second_name}', third_name = '${req.body.third_name}', client_address = '${req.body.client_address}', phone_number = '${req.body.phone_number}'
+        WHERE client_id = ${decoded.id} `, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            return res.json({
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
