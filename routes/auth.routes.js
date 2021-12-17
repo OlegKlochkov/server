@@ -184,11 +184,12 @@ router.post('/get_reviews', async (req, res) => {
 
 router.post('/add_review', async (req, res) => {
     try {
-        const {client_id, product_id, message, rating} = req.body
+        const decoded = jwt.verify(req.body.token, config.get('secret_key'));
+        const {product_id, message, rating} = req.body
         let ratingInt = parseInt(rating, 10);
 
         if(rating.length == 1 && ratingInt >= 1 && ratingInt <=5){
-            mysqls.executeQuery(`INSERT INTO reviews (client_id, product_id, message, rating) VALUES ('${client_id}', '${product_id}', '${message}', '${rating}')`);
+            mysqls.executeQuery(`INSERT INTO reviews (client_id, product_id, message, rating) VALUES ('${decoded.id}', '${product_id}', '${message}', '${rating}')`);
             res.send("Отзыв успешно добавлен")
         }else{
             res.send("Введите целое число от 1 до 5!!!")
