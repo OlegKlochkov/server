@@ -335,4 +335,56 @@ router.post('/update_client', async (req, res) => {
     }
 })
 
+router.post('/get_shops', async (req, res) => {
+    try {
+        mysqls.executeQuery(`SELECT * FROM shops`, function (err, rows, fields) {
+
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            return res.json({
+                shops: rows
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
+router.post('/get_products_in_shop', async (req, res) => {
+    try {
+        mysqls.executeQuery(`SELECT availability_in_the_shop.*, products.*
+        FROM availability_in_the_shop, products WHERE availability_in_the_shop.shop_id = ${req.body.shop_id} AND products.products_id = availability_in_the_shop.product_id`, function (err, rows, fields) {
+            if (err) {
+                console.log('[DATABASE | ERROR] ' + err);
+                return;
+            }
+
+            if (rows.length === 0) {
+                return res.status(400).json({ message: "Пользователь не найден." })
+            }
+            let arr = [];
+            rows.forEach(element => {
+                arr.push({
+                    products_id: element.products_id,
+                    name: element.name,
+                    price: element.price
+                })
+            });
+            return res.json({
+                products_in_shop: arr
+            })
+        });
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
