@@ -388,4 +388,24 @@ router.post('/get_products_in_shop', async (req, res) => {
     }
 })
 
+router.post('/add_order', async (req, res) => {
+    try {
+        const decoded = jwt.verify(req.body.token, config.get('secret_key'));
+        const products = req.body.cart
+
+            mysqls.executeQuery(`INSERT INTO orders (client_id, shop_id, order_status, date, order_type, sum) 
+            VALUES ('${decoded.id}', '${req.body.shop_id === undefined ? '' : req.body.shop_id}', 'в процессе обработки', 
+            '${Date().toISOString().slice(0, 19).replace('T', ' ')}', '${req.body.shop_id === undefined ? 'доставка' : 'самовывоз'}', '${req.body.sum}')`);
+            let order_id = mysqls.executeQuery(`SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1`, function (err, rows, fields) {
+                return(rows.order_id);});
+            products.map(function(e){
+                mysqls.executeQuery(`INSERT INTO products_in_orders (order_id, product_id, amount) VALUES (${order_id})'`)
+            })
+            res.send("Заказ успешно оформлен")
+    } catch (e) {
+        console.log(e);
+        res.send({ message: "server error" })
+    }
+})
+
 module.exports = router;
